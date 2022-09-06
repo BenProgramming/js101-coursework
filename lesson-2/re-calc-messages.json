@@ -1,0 +1,25 @@
+{
+  "en" : {
+    "wlcm" : "Welcome to Calculator!",
+    "frstNumQ" : "What's your first number?",
+    "secNumQ" : "What's your second number?", 
+    "operListQ" : "What operation would you like to perform on these two numbers? \n1) Add\n2) Substract\n3) Multiply \n4) Divide",
+    "wrgNum" : "Hmm that doesn't look right... Please enter a valid number: ",
+    "wrgOpNum" : "You must choose 1, 2, 3, or 4",
+    "anotherCalc" : "Please enter '1' if you would like to perform another calculation, if not anything else or enter: ",
+    "numbersPrompt" : ["number1:", "number2:"],
+    "resultPrompt" : "The result is:"
+  }, 
+
+  "fr" : {
+    "wlcm" : "Bienvenue sur Calculatrice!",
+    "frstNumQ" : "Quel est votre premier numéro?",
+    "secNumQ" : "Quel est votre deuxième numéro?",
+    "operListQ" : "Quelle opération souhaiteriez-vous effectuer sur ces deux nombres? \n1) Rajouter\n2) Soustraire\n3) Multiplier\n4) Diviser",
+    "wrgNum" : "Hmm ça n'a pas l'air bien... S'il vous plait, entrez un nombre valide: ",
+    "wrgOpNum" : "Vous devez choisir 1, 2, 3, ou 4",
+    "anotherCalc" : "Veuillez entrer '1' si vous souhaitez effectuer un autre calcul, si ce n'est rien d'autre ou entrez:",
+    "numbersPrompt" : ["numéro1:",  "numéro2:"],
+    "resultPrompt" : "Le résultat est:"
+  }
+}
