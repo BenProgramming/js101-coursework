@@ -7,7 +7,8 @@
     "wrgNum" : "Hmm that doesn't look right... Please enter a valid number: ",
     "wrgOpNum" : "You must choose 1, 2, 3, or 4",
     "anotherCalc" : "Please enter '1' if you would like to perform another calculation, if not anything else or enter: ",
-    "numbersPrompt" : ["number1:", "number2:"],
+    "numPrompt1" : "number1:", 
+    "numPrompt2" : "number2:",
     "resultPrompt" : "The result is:"
   }, 
 
@@ -19,7 +20,8 @@
     "wrgNum" : "Hmm ça n'a pas l'air bien... S'il vous plait, entrez un nombre valide: ",
     "wrgOpNum" : "Vous devez choisir 1, 2, 3, ou 4",
     "anotherCalc" : "Veuillez entrer '1' si vous souhaitez effectuer un autre calcul, si ce n'est rien d'autre ou entrez:",
-    "numbersPrompt" : ["numéro1:",  "numéro2:"],
+    "numPrompt1" : "numéro1:", 
+    "numPrompt2" : "numéro2:",
     "resultPrompt" : "Le résultat est:"
   }
 }
