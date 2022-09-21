@@ -1,0 +1,12 @@
+{
+  "en" : {
+    "getAmt" : "Please enter the total loan amount: ",
+    "getApr" : "Please enter the loan APR in basis point form to the thousandths place (3% = 300): ",
+    "getDurationM" : "Please enter the duration of the loan in months: ",
+    "outMonthlyPay" : "Your monthly payment will be: ",
+    "wrgAmt" : "Incorrect input, please enter a positive total for your loan with only two decimal places: ",
+    "wrgApr" : "Incorrect input, please enter a non-negative APR in basis points format (10% = 1000): ", 
+    "wrgDuration" : "Incorrect input, please enter a non-negative number of months: ",
+    "inputAnother" : "enter '1' if you would like to perform another calculation: "
+  }
+}
