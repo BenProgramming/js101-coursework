@@ -13,16 +13,12 @@ function playerWins(usrCh, cpuCh) {
   return WINNING_COMBINATIONS[usrCh].includes(cpuCh);
 }
 
-function output(message, print = 1) {
-  if (print === 1) {
-    console.log(`=> ${message}`);
-  } else if (print === 0) {
-    return `=> ${message}`;
-  }
+function output(message) {
+  console.log(`=> ${message}`);
 }
 
 function input(message) {
-  return readline.question(`${output(message, 0)}`);
+  return readline.question(`=> ${message}`);
 }
 
 while (true) {
