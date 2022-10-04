@@ -1,8 +1,3 @@
-/*
-
-
-*/
-
 const readline = require('readline-sync');
 const VALID_CHOICES = ['rock', 'paper', 'scissors'];
 
