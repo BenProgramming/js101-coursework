@@ -9,6 +9,10 @@ const WINNING_COMBINATIONS = {
   spock: ['rock', 'scissors']
 };
 
+function playerWins(usrCh, cpuCh) {
+  return WINNING_COMBINATIONS[usrCh].includes(cpuCh);
+}
+
 function output(message, print = 1) {
   if (print === 1) {
     console.log(`=> ${message}`);
@@ -62,8 +66,4 @@ while (true) {
   }
 
   if (contQ[0] === 'n') break;
-}
-
-function playerWins(usrCh, cpuCh) {
-  return WINNING_COMBINATIONS[usrCh].includes(cpuCh);
 }
