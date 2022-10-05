@@ -85,7 +85,7 @@ function roundWon() {
   }
 }
 
-// How to play! 
+// How to play!
 output(`Welcome to Rock Paper Scissors Spock Lizard!`);
 output(`Scissors cuts Paper, Paper covers Rock`);
 output(`Rock crushes Lizard, Lizard poisons Spock`);
@@ -109,14 +109,3 @@ while (true) {
   let anotherRound = playAnotherGameQ();
   if (anotherRound === 'n' || anotherRound === 'no') break;
 }
-
-
-/* REVIEW NOTES
-  - Welcome message explaining how Lizard and Spock work
-  - yesno working as a yes => check for the explicit values of 'y' 'n' and 'yes'
-    and 'no'
-  - const variable for the number of rounds + adding a function for User to
-    select the number of rounds that they would like to play
-  - Add current score to the message after round
-
-*/
