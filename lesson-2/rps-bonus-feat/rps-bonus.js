@@ -8,7 +8,10 @@ const WINNING_COMBINATIONS = {
   lizard: ['paper', 'spock'],
   spock: ['rock', 'scissors']
 };
-const WIN_SCORE = 3;
+const SCORE_TO_WIN = 3;
+
+let wins = 0;
+let cpuWins = 0;
 
 function playerWins(usrCh, cpuCh) {
   return WINNING_COMBINATIONS[usrCh].includes(cpuCh);
@@ -27,56 +30,92 @@ function computerChoice() {
   return VALID_CHOICES[randomIndex];
 }
 
-while (true) {
-  let wins = 0;
-  let cpuWins = 0;
+function determineWinnerOfRound(userChoice, cpuChoice) {
+  if (userChoice === cpuChoice) {
+    output(`Draw`);
+  } else if (playerWins(userChoice, cpuChoice)) {
+    output(`You won!`);
+    wins += 1;
+  } else if (!playerWins(userChoice, cpuChoice)) {
+    output(`The CPU won...`);
+    cpuWins += 1;
+  }
+  output(`The current score is, player1: ${wins} cpu: ${cpuWins}`);
+}
 
-  while (!(wins === WIN_SCORE|| cpuWins === WIN_SCORE)) {
-    let choice = input(`Choose one: ${VALID_CHOICES.join(', ')}: `);
-    while (!VALID_CHOICES.includes(choice)) {
-      choice = input('Please enter a valid choice: ');
-    }
-    if (VALID_CHOICES.indexOf(choice) > 4) {
-      choice = VALID_CHOICES[VALID_CHOICES.indexOf(choice) - 5];
-    }
-    
-    let rpsCpuChoice = computerChoice();
-    output(`You chose ${choice}, the 'CPU' chose ${rpsCpuChoice}`);
+function getUserChoice() {
+  let userChoice = input(`Choose one: ${VALID_CHOICES.join(', ')}: `);
 
-    if (rpsCpuChoice === choice) {
-      output(`Draw`);
-    } else if (playerWins(choice, rpsCpuChoice)) {
-      output(`You won!`);
-      wins += 1;
-    } else if (!playerWins(choice, rpsCpuChoice)) {
-      output(`The CPU won...`);
-      cpuWins += 1;
-    }
+  while (!VALID_CHOICES.includes(userChoice)) {
+    userChoice = input('Please enter a valid choice: ');
   }
 
+  if (VALID_CHOICES.indexOf(userChoice) > 4) {
+    userChoice = VALID_CHOICES[VALID_CHOICES.indexOf(userChoice) - 5];
+  }
+
+  return userChoice;
+}
+
+function playAnotherGameQ() {
+  let contQ = input(`Would you like to play again (y/n)?\n`).toLowerCase().
+    trim();
+  while (contQ !== 'n' && contQ !== 'y' && contQ !== 'yes' && contQ !== 'no') {
+    contQ = input(`Please enter 'y', 'n', or 'yes', 'no' to continue\n`).
+      toLowerCase();
+  }
+  return contQ;
+}
+
+function determineWinnerOfGame() {
   if (cpuWins === 3) {
     output(`The CPU is the Grand Winner :/`);
-  } else {
+  } else if (wins === 3) {
     output(`You are the Grand Winner!`);
   }
+  wins = 0;
+  cpuWins = 0;
+}
 
-  let contQ = input(`Would you like to play again (y/n)?\n`).toLowerCase()
-  .trim();
-  console.log("The value of contQ:\n", contQ);
-  while (contQ !== 'n' && contQ !== 'y' && contQ !== 'yes' && contQ !== 'no') {
-    contQ = input(`Please enter 'y', 'n', or 'yes', 'no' to continue\n`)
-    .toLowerCase();
+function roundWon() {
+  if (wins === SCORE_TO_WIN || cpuWins === SCORE_TO_WIN) {
+    return true;
+  } else {
+    return false;
+  }
+}
+
+// How to play! 
+output(`Welcome to Rock Paper Scissors Spock Lizard!`);
+output(`Scissors cuts Paper, Paper covers Rock`);
+output(`Rock crushes Lizard, Lizard poisons Spock`);
+output(`Spock smashes Lizard, Scissors decapitates Lizard`);
+output(`Lizard eats Paper, Paper disproves Spock`);
+output(`Spock vaporizes Rock, Rock crushes Scissors`);
+output(`You may choose from the above to play agains the CPU`);
+output(`or their relative shorthand versions: r, p, s, l, sp`);
+
+while (true) {
+  while (!roundWon()) {
+    let userChoice = getUserChoice();
+    let rpsCpuChoice = computerChoice();
+
+    output(`You chose ${userChoice}, the 'CPU' chose ${rpsCpuChoice}`);
+    determineWinnerOfRound(userChoice, rpsCpuChoice);
   }
 
-  if (contQ === 'n' || contQ === 'no') break;
+  determineWinnerOfGame();
+
+  let anotherRound = playAnotherGameQ();
+  if (anotherRound === 'n' || anotherRound === 'no') break;
 }
 
 
-/* REVIEW NOTES 
+/* REVIEW NOTES
   - Welcome message explaining how Lizard and Spock work
   - yesno working as a yes => check for the explicit values of 'y' 'n' and 'yes'
     and 'no'
-  - const variable for the number of rounds + adding a function for User to 
+  - const variable for the number of rounds + adding a function for User to
     select the number of rounds that they would like to play
   - Add current score to the message after round
 
