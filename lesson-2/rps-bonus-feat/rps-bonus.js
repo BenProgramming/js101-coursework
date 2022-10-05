@@ -85,7 +85,6 @@ function roundWon() {
   }
 }
 
-// How to play!
 output(`Welcome to Rock Paper Scissors Spock Lizard!`);
 output(`Scissors cuts Paper, Paper covers Rock`);
 output(`Rock crushes Lizard, Lizard poisons Spock`);
