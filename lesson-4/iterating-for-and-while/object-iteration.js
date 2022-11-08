@@ -17,4 +17,3 @@ while (i < petKeys.length) {
 for (let i in numberOfPets) {
   console.log(i, ":", numberOfPets[i]);
 };
-

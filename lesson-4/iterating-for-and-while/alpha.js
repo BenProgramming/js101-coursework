@@ -9,4 +9,3 @@ while (counter < alphabet.length) {
 for (let i = 0; i < alphabet.length; i += 1) {
   console.log(alphabet.charAt(i));
 }
-

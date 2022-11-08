@@ -19,7 +19,7 @@ function reverse(arr) {
   return arr;
 }
 
-// Book solution
+// Text solution
 function reverse0(array) {
   let leftIndex = 0;
   let rightIndex = array.length - 1;
