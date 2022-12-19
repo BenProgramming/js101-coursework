@@ -35,7 +35,9 @@ Bonus Features Outlined
 
     Personal TODO
     - add settings option to change the offensive and defense functions
-    - see chalk for changing the output for the application 
+    - see chalk for changing the output for the application
+    - possibly add more spaces, or a setting to change the amount of spaces
+      three, four, or five in a row
 */
 
 
