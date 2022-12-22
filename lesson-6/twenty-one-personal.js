@@ -1,82 +1,82 @@
 const rlSync = require('readline-sync');
 
 const DECK_OF_CARDS = {
-  highCardKey: {
-    11: 'jack',
-    12: 'queen',
-    13: 'king',
-    14: 'ace'
+  14: {
+    name: 'ace',
+    value: 1,
+    suits: ['clubs', 'diamonds', 'hearts', 'spades']
   },
-  ace: {
-    value: [1, 11],
-    delt: 0
-  },
-  king: {
+  13: {
+    name: 'king',
     value: 10,
-    delt: 0
+    suits: ['clubs', 'diamonds', 'hearts', 'spades']
   },
-  queen: {
+  12: {
+    name: 'queen',
     value: 10,
-    delt: 0
+    suits: ['clubs', 'diamonds', 'hearts', 'spades']
   },
-  jack: {
+  11: {
+    name: 'jack',
     value: 10,
-    delt: 0
+    suits: ['clubs', 'diamonds', 'hearts', 'spades']
   },
   10: {
     value: 10,
-    delt: 0
+    suits: ['clubs', 'diamonds', 'hearts', 'spades']
   },
   9: {
     value: 9,
-    delt: 0
+    suits: ['clubs', 'diamonds', 'hearts', 'spades']
   },
   8: {
     value: 8,
-    delt: 0
+    suits: ['clubs', 'diamonds', 'hearts', 'spades']
   },
   7: {
     value: 7,
-    delt: 0
+    suits: ['clubs', 'diamonds', 'hearts', 'spades']
   },
   6: {
     value: 6,
-    delt: 0
+    suits: ['clubs', 'diamonds', 'hearts', 'spades']
   },
   5: {
     value: 5,
-    delt: 0
+    suits: ['clubs', 'diamonds', 'hearts', 'spades']
   },
   4: {
     value: 4,
-    delt: 0
+    suits: ['clubs', 'diamonds', 'hearts', 'spades']
   },
   3: {
     value: 3,
-    delt: 0
+    suits: ['clubs', 'diamonds', 'hearts', 'spades']
   },
   2: {
     value: 2,
-    delt: 0
+    suits: ['clubs', 'diamonds', 'hearts', 'spades']
   }
 };
 const PLAYER_HAND = [];
 const HOUSE_HAND = [];
 
+
 while (true) {
   let someoneBusted = false;
-  [PLAYER_HAND[0], PLAYER_HAND[1]] = [dealCard(), dealCard()];
-  [HOUSE_HAND[0], HOUSE_HAND[1]] = [dealCard(), dealCard()];
+  [PLAYER_HAND[0], PLAYER_HAND[1]] = [dealCardKeySuit(), dealCardKeySuit()];
+  [HOUSE_HAND[0], HOUSE_HAND[1]] = [dealCardKeySuit(), dealCardKeySuit()];
 
   output(`You hand: ${displayHand(PLAYER_HAND)}`);
 
   // User drawing cycle
   while (true) {
     let keepGoing = specInputCaseInsensitiveTrimed('Please enter "stay" to end drawing, or "hit" to draw another card: ', ['stay', 'hit']);
+    console.clear();
     if (keepGoing === 'stay') break;
 
-    PLAYER_HAND.push(dealCard());
-    output(`You drew: ${PLAYER_HAND[PLAYER_HAND.length - 1]}`);
+    PLAYER_HAND.push(dealCardKeySuit());
+    output(`You drew: ${displayCard(PLAYER_HAND[PLAYER_HAND.length - 1])}`);
 
     if (busted(PLAYER_HAND)) {
       someoneBusted = true;
@@ -88,35 +88,35 @@ while (true) {
 
   // Dealer drawing cycle
   while (!someoneBusted && !handGreaterThan(HOUSE_HAND, 16)) {
-    HOUSE_HAND.push(dealCard());
+    HOUSE_HAND.push(dealCardKeySuit());
     if (busted(HOUSE_HAND)) {
       someoneBusted = true;
     }
   }
 
-  // Address someone busting (going over 21)
+  // Someone went over 21
   if (someoneBusted && busted(PLAYER_HAND)) {
     output('You busted, tough luck... Play again maybe? ');
   } else if (someoneBusted && busted(HOUSE_HAND)) {
     output('The dealer busted, you won!');
+  } else if (!someoneBusted) {
+    // Deciding Winner
+    let playerWon = decideWinner(PLAYER_HAND, HOUSE_HAND);
+    if (playerWon === undefined) {
+      output(`Your total is: ${sumHand(PLAYER_HAND)} tying the Dealer's hand of ${sumHand(HOUSE_HAND)}`);
+      output(`The Dealer's hand was: ${displayHand(HOUSE_HAND)}`);
+    } else if (playerWon) {
+      output(`Your total is: ${sumHand(PLAYER_HAND)} beating the Dealer's hand of ${sumHand(HOUSE_HAND)}.`);
+      output(`The Dealer's hand was: ${displayHand(HOUSE_HAND)}`);
+    } else if (!playerWon) {
+      output(`The Dealer's total is: ${sumHand(HOUSE_HAND)} beating your hand of ${sumHand(PLAYER_HAND)}.`);
+      output(`The Dealer's hand was: ${displayHand(HOUSE_HAND)}`);
+    }
   }
 
-  // Display & decide outcome of neither hand going over 21
-  let playerWon = decideWinner(PLAYER_HAND, HOUSE_HAND);
-  if (playerWon === undefined) {
-    output(`Your total is: ${sumHand(PLAYER_HAND)} tying the Dealer's hand of ${sumHand(HOUSE_HAND)}`);
-    output(`The Dealer's hand was: ${HOUSE_HAND.join(', ')}`);
-  } else if (playerWon) {
-    output(`Your total is: ${sumHand(PLAYER_HAND)} beating the Dealer's hand of ${sumHand(HOUSE_HAND)}.`);
-    output(`The Dealer's hand was: ${HOUSE_HAND.join(', ')}`);
-  } else if (!playerWon) {
-    output(`The Dealer's total is: ${sumHand(HOUSE_HAND)} beating your hand of ${sumHand(PLAYER_HAND)}.`);
-    output(`The Dealer's hand was: ${HOUSE_HAND.join(', ')}`);
-  }
-
-  // Collect input to terminate or play another round
   let playAgain = specInputCaseInsensitiveTrimed(`Please enter 'yes' to play another hand or 'no' to quit playing: `, ['yes', 'no']);
   if (playAgain === 'no') break;
+
   resetDeck();
   console.clear();
 }
@@ -125,7 +125,16 @@ function displayHand(handArr) {
   if (handArr.length === 0) {
     return undefined;
   }
-  return handArr.join(', ');
+
+  handArr = handArr.map(displayCard);
+  return `{ ${handArr.join(' | ')} }`;
+}
+
+function displayCard(handArr) {
+  if (DECK_OF_CARDS[handArr[0]].hasOwnProperty('name')) {
+    return DECK_OF_CARDS[handArr[0]]['name'] + " of " + handArr[1];
+  }
+  return String(handArr[0]) + ' of ' + handArr[1];
 }
 
 function busted(handArr) {
@@ -145,9 +154,12 @@ function decideWinner(handOne, handTwo) {
   }
 }
 
-function specInputCaseInsensitiveTrimed(strPrompt, arrOfAllowedInput) {
+function specInputCaseInsensitiveTrimed(strPrompt, arrOfAllowedInput, rePromptStr = '') {
   let userInput = input(strPrompt).toLowerCase().trim();
   while (!arrOfAllowedInput.includes(userInput)) {
+    if (rePromptStr) {
+      userInput = input(rePromptStr).toLowerCase().trim();
+    }
     userInput = input(strPrompt).toLowerCase().trim();
   }
   return userInput;
@@ -160,28 +172,26 @@ function handGreaterThan(hand, num) {
   return false;
 }
 
-function dealCard() {
-  let card;
+function dealCardKeySuit() {
+  let cardKey;
   do {
-    card = Math.floor((Math.random() * 13)) + 2;
-    if (card > 10) {
-      card = DECK_OF_CARDS['highCardKey'][card];
-    }
-  } while (DECK_OF_CARDS[card]['delt'] >= 4);
+    cardKey = Math.floor((Math.random() * 13)) + 2;
+  } while (DECK_OF_CARDS[cardKey]['suits'].length === 0);
 
-  DECK_OF_CARDS[card]['delt'] += 1;
-  return String(card);
+  let suitKey = Math.floor(Math.random() *
+    DECK_OF_CARDS[cardKey]['suits'].length);
+
+  return [cardKey, DECK_OF_CARDS[cardKey]['suits'].splice(suitKey, 1)];
 }
-
 
 function sumHand(hand) {
   let aceCount = 0;
   let sumWithoutAce = hand.reduce((accum, val) => {
-    if (val === 'ace') {
+    if (Number(val[0]) === 14) {
       aceCount++;
       return accum;
     }
-    return accum + DECK_OF_CARDS[val]['value'];
+    return accum + DECK_OF_CARDS[val[0]]['value'];
   }, 0);
 
   return aceCalc(sumWithoutAce, aceCount);
@@ -201,15 +211,14 @@ function aceCalc(handTotal, numOfAces) {
 }
 
 function resetDeck() {
-  // 'Collect' cards to be dealt again
+  // "Collecting cards" for next game, adding suits back to the data structure
   for (let card in DECK_OF_CARDS) {
-    if (card === 'highCardKey') continue;
-    DECK_OF_CARDS[card]['delt'] = 0;
+    DECK_OF_CARDS[card]['suits'] = ['clubs', 'diamonds', 'hearts', 'spades'];
   }
 
-  // Empty arrays representing Dealer & Player's hands
+  // Resetting Player and Dealer's hand to [];
   PLAYER_HAND.splice(0, PLAYER_HAND.length);
-  HOUSE_HAND.splice(0, PLAYER_HAND.length);
+  HOUSE_HAND.splice(0, HOUSE_HAND.length);
 }
 
 function input(str) {
