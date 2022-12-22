@@ -63,34 +63,21 @@ const DECK_OF_CARDS = {
 const PLAYER_HAND = [];
 const HOUSE_HAND = [];
 
-
-// TODO: 
-// X Data Structure
-// X Deal Cards function
-// 
-// X function for summing card total
-// - gameplay flow -> expound rounds? stopping when? 
-// X function for input and output
-// X (changed output format) proper display of hand with proper verbage e.g. an 8, an Ace, a 7 etc.
-// X check occasional Dealer hand being higher than the User's winning
-// - change data structure to include suit
-// - data struture changing the high card keys to numbers related to 
-// - adding cool graphical display for deck
-
 while (true) {
   let someoneBusted = false;
   [PLAYER_HAND[0], PLAYER_HAND[1]] = [dealCard(), dealCard()];
   [HOUSE_HAND[0], HOUSE_HAND[1]] = [dealCard(), dealCard()];
 
   output(`You hand: ${displayHand(PLAYER_HAND)}`);
-  
+
+  // User drawing cycle
   while (true) {
     let keepGoing = specInputCaseInsensitiveTrimed('Please enter "stay" to end drawing, or "hit" to draw another card: ', ['stay', 'hit']);
     if (keepGoing === 'stay') break;
 
     PLAYER_HAND.push(dealCard());
     output(`You drew: ${PLAYER_HAND[PLAYER_HAND.length - 1]}`);
-    
+
     if (busted(PLAYER_HAND)) {
       someoneBusted = true;
       break;
@@ -99,7 +86,7 @@ while (true) {
     }
   }
 
-  // Computer drawing 'cycle'
+  // Dealer drawing cycle
   while (!someoneBusted && !handGreaterThan(HOUSE_HAND, 16)) {
     HOUSE_HAND.push(dealCard());
     if (busted(HOUSE_HAND)) {
@@ -107,27 +94,27 @@ while (true) {
     }
   }
 
+  // Address someone busting (going over 21)
   if (someoneBusted && busted(PLAYER_HAND)) {
     output('You busted, tough luck... Play again maybe? ');
   } else if (someoneBusted && busted(HOUSE_HAND)) {
     output('The dealer busted, you won!');
   }
 
+  // Display & decide outcome of neither hand going over 21
   let playerWon = decideWinner(PLAYER_HAND, HOUSE_HAND);
-
-  if (!someoneBusted && playerWon) {
-    output(`Your total is: ${sumHand(PLAYER_HAND)} beating the Dealer's hand of ${sumHand(HOUSE_HAND)}.`);
-    output(`The Dealer's hand was: ${HOUSE_HAND.join(', ')}`);
-  } else if (!someoneBusted && playerWon === undefined) {
+  if (playerWon === undefined) {
     output(`Your total is: ${sumHand(PLAYER_HAND)} tying the Dealer's hand of ${sumHand(HOUSE_HAND)}`);
     output(`The Dealer's hand was: ${HOUSE_HAND.join(', ')}`);
-  } else if (!someoneBusted && !playerWon) {
+  } else if (playerWon) {
+    output(`Your total is: ${sumHand(PLAYER_HAND)} beating the Dealer's hand of ${sumHand(HOUSE_HAND)}.`);
+    output(`The Dealer's hand was: ${HOUSE_HAND.join(', ')}`);
+  } else if (!playerWon) {
     output(`The Dealer's total is: ${sumHand(HOUSE_HAND)} beating your hand of ${sumHand(PLAYER_HAND)}.`);
     output(`The Dealer's hand was: ${HOUSE_HAND.join(', ')}`);
   }
 
-  
-
+  // Collect input to terminate or play another round
   let playAgain = specInputCaseInsensitiveTrimed(`Please enter 'yes' to play another hand or 'no' to quit playing: `, ['yes', 'no']);
   if (playAgain === 'no') break;
   resetDeck();
@@ -214,11 +201,13 @@ function aceCalc(handTotal, numOfAces) {
 }
 
 function resetDeck() {
+  // 'Collect' cards to be dealt again
   for (let card in DECK_OF_CARDS) {
     if (card === 'highCardKey') continue;
     DECK_OF_CARDS[card]['delt'] = 0;
   }
 
+  // Empty arrays representing Dealer & Player's hands
   PLAYER_HAND.splice(0, PLAYER_HAND.length);
   HOUSE_HAND.splice(0, PLAYER_HAND.length);
 }
