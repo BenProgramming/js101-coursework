@@ -69,6 +69,7 @@ while (true) {
 
   output(`You hand: ${displayHand(PLAYER_HAND)}`);
 
+  // User drawing cycle
   while (true) {
     let keepGoing = specInputCaseInsensitiveTrimed('Please enter "stay" to end drawing, or "hit" to draw another card: ', ['stay', 'hit']);
     console.clear();
@@ -93,23 +94,24 @@ while (true) {
     }
   }
 
+  // Someone went over 21
   if (someoneBusted && busted(PLAYER_HAND)) {
     output('You busted, tough luck... Play again maybe? ');
   } else if (someoneBusted && busted(HOUSE_HAND)) {
     output('The dealer busted, you won!');
-  }
-
-  let playerWon = decideWinner(PLAYER_HAND, HOUSE_HAND);
-
-  if (!someoneBusted && playerWon) {
-    output(`Your total is: ${sumHand(PLAYER_HAND)} beating the Dealer's hand of ${sumHand(HOUSE_HAND)}.`);
-    output(`The Dealer's hand was: ${displayHand(HOUSE_HAND)}`);
-  } else if (!someoneBusted && playerWon === undefined) {
-    output(`Your total is: ${sumHand(PLAYER_HAND)} tying the Dealer's hand of ${sumHand(HOUSE_HAND)}`);
-    output(`The Dealer's hand was: ${displayHand(HOUSE_HAND)}`);
-  } else if (!someoneBusted && !playerWon) {
-    output(`The Dealer's total is: ${sumHand(HOUSE_HAND)} beating your hand of ${sumHand(PLAYER_HAND)}.`);
-    output(`The Dealer's hand was: ${displayHand(HOUSE_HAND)}`);
+  } else if (!someoneBusted) {
+    // Deciding Winner
+    let playerWon = decideWinner(PLAYER_HAND, HOUSE_HAND);
+    if (playerWon === undefined) {
+      output(`Your total is: ${sumHand(PLAYER_HAND)} tying the Dealer's hand of ${sumHand(HOUSE_HAND)}`);
+      output(`The Dealer's hand was: ${displayHand(HOUSE_HAND)}`);
+    } else if (playerWon) {
+      output(`Your total is: ${sumHand(PLAYER_HAND)} beating the Dealer's hand of ${sumHand(HOUSE_HAND)}.`);
+      output(`The Dealer's hand was: ${displayHand(HOUSE_HAND)}`);
+    } else if (!playerWon) {
+      output(`The Dealer's total is: ${sumHand(HOUSE_HAND)} beating your hand of ${sumHand(PLAYER_HAND)}.`);
+      output(`The Dealer's hand was: ${displayHand(HOUSE_HAND)}`);
+    }
   }
 
   let playAgain = specInputCaseInsensitiveTrimed(`Please enter 'yes' to play another hand or 'no' to quit playing: `, ['yes', 'no']);
@@ -152,9 +154,12 @@ function decideWinner(handOne, handTwo) {
   }
 }
 
-function specInputCaseInsensitiveTrimed(strPrompt, arrOfAllowedInput) {
+function specInputCaseInsensitiveTrimed(strPrompt, arrOfAllowedInput, rePromptStr = '') {
   let userInput = input(strPrompt).toLowerCase().trim();
   while (!arrOfAllowedInput.includes(userInput)) {
+    if (rePromptStr) {
+      userInput = input(rePromptStr).toLowerCase().trim();
+    }
     userInput = input(strPrompt).toLowerCase().trim();
   }
   return userInput;
@@ -206,10 +211,12 @@ function aceCalc(handTotal, numOfAces) {
 }
 
 function resetDeck() {
+  // "Collecting cards" for next game, adding suits back to the data structure
   for (let card in DECK_OF_CARDS) {
     DECK_OF_CARDS[card]['suits'] = ['clubs', 'diamonds', 'hearts', 'spades'];
   }
 
+  // Resetting Player and Dealer's hand to [];
   PLAYER_HAND.splice(0, PLAYER_HAND.length);
   HOUSE_HAND.splice(0, HOUSE_HAND.length);
 }
