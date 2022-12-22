@@ -1,63 +1,61 @@
 const rlSync = require('readline-sync');
 
 const DECK_OF_CARDS = {
-  highCardKey: {
-    11: 'jack',
-    12: 'queen',
-    13: 'king',
-    14: 'ace'
+  14: {
+    name: 'ace',
+    value: 1,
+    suits: ['clubs', 'diamonds', 'hearts', 'spades']
   },
-  ace: {
-    value: [1, 11],
-    delt: 0
-  },
-  king: {
+  13: {
+    name: 'king',
     value: 10,
-    delt: 0
+    suits: ['clubs', 'diamonds', 'hearts', 'spades']
   },
-  queen: {
+  12: {
+    name: 'queen',
     value: 10,
-    delt: 0
+    suits: ['clubs', 'diamonds', 'hearts', 'spades']
   },
-  jack: {
+  11: {
+    name: 'jack',
     value: 10,
-    delt: 0
+    suits: ['clubs', 'diamonds', 'hearts', 'spades']
   },
   10: {
     value: 10,
-    delt: 0
+    suits: ['clubs', 'diamonds', 'hearts', 'spades']
   },
   9: {
     value: 9,
-    delt: 0
+    suits: ['clubs', 'diamonds', 'hearts', 'spades']
   },
   8: {
     value: 8,
-    delt: 0
+    suits: ['clubs', 'diamonds', 'hearts', 'spades']
   },
   7: {
     value: 7,
-    delt: 0
+    suits: ['clubs', 'diamonds', 'hearts', 'spades']
   },
   6: {
     value: 6,
-    delt: 0
+    suits: ['clubs', 'diamonds', 'hearts', 'spades']
   },
   5: {
     value: 5,
-    delt: 0
+    suits: ['clubs', 'diamonds', 'hearts', 'spades']
   },
   4: {
     value: 4,
-    delt: 0
+    suits: ['clubs', 'diamonds', 'hearts', 'spades']
   },
   3: {
     value: 3,
-    delt: 0
+    suits: ['clubs', 'diamonds', 'hearts', 'spades']
   },
   2: {
     value: 2,
-    delt: 0
+    suits: ['clubs', 'diamonds', 'hearts', 'spades']
   }
 };
 const PLAYER_HAND = [];
