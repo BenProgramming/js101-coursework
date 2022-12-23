@@ -3,6 +3,10 @@ const readline = require('readline-sync');
 const SUITS = ['H', 'D', 'S', 'C'];
 const VALUES = ['2', '3', '4', '5', '6', '7', '8', '9', '10', 'J', 'Q', 'K', 'A'];
 
+const POINTS_TO_WIN = 5;
+const DEALER_STOP_TOTAL = 17;
+const IDEAL_CARD_SUM = 21;
+
 function prompt(message) {
   console.log(`=> ${message}`);
 }
@@ -49,23 +53,34 @@ function total(cards) {
 
   // correct for Aces
   values.filter(value => value === "A").forEach(_ => {
-    if (sum > 21) sum -= 10;
+    if (sum > IDEAL_CARD_SUM) sum -= 10;
   });
 
   return sum;
 }
 
-function busted(cards) {
-  return total(cards) > 21;
+function busted(cardTotal) {
+  return cardTotal > IDEAL_CARD_SUM;
 }
 
-function detectResult(dealerCards, playerCards) {
-  let playerTotal = total(playerCards);
-  let dealerTotal = total(dealerCards);
+function winnerOfRound(playerTotal, dealerTotal) {
+  let winner = detectResult(playerTotal, dealerTotal);
+  if (winner === 'PLAYER' || busted(dealerTotal)) {
+    return 'PLAYER';
+  } else if (winner === 'DEALER' || busted(playerTotal)) {
+    return 'DEALER';
+  }
+  return false;
+}
 
-  if (playerTotal > 21) {
+function displayScore(playerWins, dealerWins) {
+  prompt(`\n${POINTS_TO_WIN} wins to win the match!\n\nThe score is\nHouse: ${dealerWins} Player: ${playerWins}\n`);
+}
+
+function detectResult(playerTotal, dealerTotal) {
+  if (playerTotal > IDEAL_CARD_SUM) {
     return 'PLAYER_BUSTED';
-  } else if (dealerTotal > 21) {
+  } else if (dealerTotal > IDEAL_CARD_SUM) {
     return 'DEALER_BUSTED';
   } else if (dealerTotal < playerTotal) {
     return 'PLAYER';
@@ -76,9 +91,8 @@ function detectResult(dealerCards, playerCards) {
   }
 }
 
-function displayResults(dealerCards, playerCards) {
-  let result = detectResult(dealerCards, playerCards);
-
+function displayResults(playerTotal, dealerTotal) {
+  let result = detectResult(playerTotal, dealerTotal);
   switch (result) {
     case 'PLAYER_BUSTED':
       prompt('You busted! Dealer wins!');
@@ -99,9 +113,16 @@ function displayResults(dealerCards, playerCards) {
 
 function playAgain() {
   console.log('-------------');
-  prompt('Do you want to play again? (y or n)');
-  let answer = readline.question();
-  return answer.toLowerCase()[0] === 'y';
+  return specInput('Do you want to play again? (y or n)', ['y', 'n']);
+}
+
+function specInput(promptStr, allowedInput, wrgInPrompt = false) {
+  let input = readline.question(`=> ${promptStr}`);
+  if (wrgInPrompt) promptStr = wrgInPrompt;
+  while (!allowedInput.includes(input)) {
+    input = readline.question(`=> ${promptStr}`);
+  }
+  return input;
 }
 
 function popTwoFromDeck(deck) {
@@ -112,80 +133,112 @@ function hand(cards) {
   return cards.map(card => `${card[1]}${card[0]}`).join(' ');
 }
 
+function endOfRoundSummary(dealerCards, playerCards, dealerTotal, playerTotal) {
+  console.log('==============');
+  prompt(`Dealer has ${dealerCards}, for a total of: ${dealerTotal}`);
+  prompt(`Player has ${playerCards}, for a total of: ${playerTotal}`);
+  console.log('==============');
+}
+
 while (true) {
+  let endRound = false;
+  let playerWins = 0;
+  let dealerWins = 0;
   prompt('Welcome to Twenty-One!');
 
-  // declare and initialize vars
-  let deck = initalizeDeck();
-  let playerCards = [];
-  let dealerCards = [];
-
-  // initial deal
-  playerCards.push(...popTwoFromDeck(deck));
-  dealerCards.push(...popTwoFromDeck(deck));
-
-  prompt(`Dealer has ${dealerCards[0]} and ?`);
-  prompt(`You have: ${playerCards[0]} and ${playerCards[1]}, for a total of ${total(playerCards)}.`);
-
-  // player turn
   while (true) {
-    let playerTurn;
+    // declare and initialize vars
+    let deck = initalizeDeck();
+    let playerCards = [];
+    let dealerCards = [];
+
+    // initial deal and find total
+    playerCards.push(...popTwoFromDeck(deck));
+    dealerCards.push(...popTwoFromDeck(deck));
+    let dealerTotal = total(dealerCards);
+    let playerTotal = total(playerCards);
+
+    prompt(`Dealer has ${dealerCards[0]} and ?`);
+    prompt(`You have: ${playerCards[0]} and ${playerCards[1]}, for a total of ${playerTotal}.`);
+
+    // player turn
     while (true) {
-      prompt('Would you like to (h)it or (s)tay?');
-      playerTurn = readline.question().toLowerCase();
-      if (['h', 's'].includes(playerTurn)) break;
-      prompt("Sorry, must enter 'h' or 's'.");
+      let playerTurn;
+
+      while (true) {
+        prompt('Would you like to (h)it or (s)tay?');
+        playerTurn = readline.question().toLowerCase();
+        if (['h', 's'].includes(playerTurn)) break;
+        prompt("Sorry, must enter 'h' or 's'.");
+      }
+
+      if (playerTurn === 'h') {
+        playerCards.push(deck.pop());
+        playerTotal = total(playerCards);
+        prompt('You chose to hit!');
+        prompt(`Your cards are now: ${hand(playerCards)}`);
+        prompt(`Your total is now: ${playerTotal}`);
+      }
+
+      if (playerTurn === 's' || busted(playerTotal)) break;
     }
 
-    if (playerTurn === 'h') {
-      playerCards.push(deck.pop());
-      prompt('You chose to hit!');
-      prompt(`Your cards are now: ${hand(playerCards)}`);
-      prompt(`Your total is now: ${total(playerCards)}`);
-    }
-
-    if (playerTurn === 's' || busted(playerCards)) break;
-  }
-
-  if (busted(playerCards)) {
-    displayResults(dealerCards, playerCards);
-    if (playAgain()) {
-      continue;
+    if (busted(playerTotal)) {
+      endOfRoundSummary(dealerCards, playerCards, dealerTotal, playerTotal);
+      displayResults(playerTotal, dealerTotal);
     } else {
+      prompt(`You stayed at ${playerTotal}`);
+    }
+
+    // dealer turn
+    if (!busted(playerTotal)) {
+      prompt('Dealer turn...');
+
+      while (dealerTotal < DEALER_STOP_TOTAL) {
+        prompt(`Dealer hits!`);
+        dealerCards.push(deck.pop());
+        dealerTotal = total(dealerCards);
+        prompt(`Dealer's cards are now: ${hand(dealerCards)}`);
+      }
+
+      if (busted(dealerTotal)) {
+        prompt(`Dealer total is now: ${dealerTotal}`);
+        endOfRoundSummary(dealerCards, playerCards, dealerTotal, playerTotal);
+        displayResults(playerTotal, dealerTotal);
+      } else {
+        prompt(`Dealer stays at ${dealerTotal}`);
+      }
+    }
+
+    // both player and dealer stays - compare cards!
+    if (!busted(playerTotal) && !busted(dealerTotal)) {
+      endOfRoundSummary(dealerCards, playerCards, dealerTotal, playerTotal);
+      displayResults(playerTotal, dealerTotal);
+    }
+
+    if (winnerOfRound(playerTotal, dealerTotal) === 'PLAYER') {
+      playerWins += 1;
+    } else if (winnerOfRound(playerTotal, dealerTotal) === 'DEALER') {
+      dealerWins += 1;
+    }
+
+    let readyForNextRound = specInput('Ready for next round? Please enter "yes" to continue, or "no" to quit: ', ['yes', 'no']);
+    console.clear();
+    if (readyForNextRound === 'no') {
+      endRound = true;
+      prompt('Thanks for playing!');
       break;
     }
-  } else {
-    prompt(`You stayed at ${total(playerCards)}`);
-  }
 
-  // dealer turn
-  prompt('Dealer turn...');
-
-  while (total(dealerCards) < 17) {
-    prompt(`Dealer hits!`);
-    dealerCards.push(deck.pop());
-    prompt(`Dealer's cards are now: ${hand(dealerCards)}`);
-  }
-
-  if (busted(dealerCards)) {
-    prompt(`Dealer total is now: ${total(dealerCards)}`);
-    displayResults(dealerCards, playerCards);
-    if (playAgain()) {
-      continue;
-    } else {
+    displayScore(playerWins, dealerWins);
+    if (playerWins === POINTS_TO_WIN) {
+      prompt('You won the match! Congratulations!');
+      break;
+    } else if (dealerWins === POINTS_TO_WIN) {
+      prompt('The Dealer won the match... Do better next time');
       break;
     }
-  } else {
-    prompt(`Dealer stays at ${total(dealerCards)}`);
   }
 
-  // both player and dealer stays - compare cards!
-  console.log('==============');
-  prompt(`Dealer has ${dealerCards}, for a total of: ${total(dealerCards)}`);
-  prompt(`Player has ${playerCards}, for a total of: ${total(playerCards)}`);
-  console.log('==============');
-
-  displayResults(dealerCards, playerCards);
-
-  if (!playAgain()) break;
+  if (endRound || !playAgain()) break;
 }
